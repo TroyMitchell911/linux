@@ -2962,7 +2962,10 @@ static int stmmac_init_dma_engine(struct stmmac_priv *priv)
 
 	if (priv->extend_desc && (priv->mode == STMMAC_RING_MODE))
 		atds = 1;
-
+	
+	dev_err(priv->device, "id:%x\n", priv->dev->dev_id);
+	
+	msleep(1500);
 	ret = stmmac_reset(priv, priv->ioaddr);
 	if (ret) {
 		dev_err(priv->device, "Failed to reset the dma\n");
@@ -3340,6 +3343,7 @@ static int stmmac_hw_setup(struct net_device *dev, bool ptp_register)
 	/* DMA initialization and SW reset */
 	ret = stmmac_init_dma_engine(priv);
 	if (ret < 0) {
+		netdev_err(priv->dev, "this is a test message\n");
 		netdev_err(priv->dev, "%s: DMA engine initialization failed\n",
 			   __func__);
 		return ret;
