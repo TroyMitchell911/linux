@@ -42,4 +42,18 @@ config ROCKCHIP_DTPM
 	  on this platform. That will create all the power capping capable
 	  devices.
 
+config FIQ_DEBUGGER
+	bool "FIQ Mode Serial Debugger"
+	default n
+	depends on ARM || ARM64
+	help
+	  The FIQ serial debugger can accept commands even when the
+	  kernel is unresponsive due to being stuck with interrupts
+	  disabled.
+
+menu "FIQ Serial Debugger Option"
+
+source "drivers/soc/rockchip/fiq_debugger/Kconfig"
+
+endmenu
 endif

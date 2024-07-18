@@ -659,6 +659,9 @@ extern bool current_is_single_threaded(void);
  * Without tasklist/siglock it is only rcu-safe if g can't exit/exec,
  * otherwise next_thread(t) will never reach g after list_del_rcu(g).
  */
+#define do_each_thread(g, t) \
+	for (g = t = &init_task ; (g = t = next_task(g)) != &init_task ; ) do
+
 #define while_each_thread(g, t) \
 	while ((t = next_thread(t)) != g)
 

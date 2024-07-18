@@ -41,6 +41,8 @@
  * VA_BITS - the maximum number of bits for virtual addresses.
  */
 #define VA_BITS			(CONFIG_ARM64_VA_BITS)
+#define VA_START                (UL(0xffffffffffffffff) - \
+        (UL(1) << VA_BITS) + 1)
 #define _PAGE_OFFSET(va)	(-(UL(1) << (va)))
 #define PAGE_OFFSET		(_PAGE_OFFSET(VA_BITS))
 #define KIMAGE_VADDR		(MODULES_END)
