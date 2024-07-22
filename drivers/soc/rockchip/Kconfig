@@ -54,6 +54,7 @@ config FIQ_DEBUGGER
 menu "FIQ Serial Debugger Option"
 
 source "drivers/soc/rockchip/fiq_debugger/Kconfig"
+source "drivers/soc/rockchip/Kconfig.cpu"
 
 endmenu
 endif

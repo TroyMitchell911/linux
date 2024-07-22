@@ -24,7 +24,6 @@
 		     "google,kevin-rev9", "google,kevin-rev8",
 		     "google,kevin-rev7", "google,kevin-rev6",
 		     "google,kevin", "google,gru", "rockchip,rk3399";
-	chassis-type = "convertible";
 
 	/* Power tree */
 
@@ -40,23 +39,9 @@
 	};
 
 	edp_panel: edp-panel {
-		compatible = "sharp,lq123p1jx31";
+		compatible = "sharp,lq123p1jx31", "simple-panel";
 		backlight = <&backlight>;
 		power-supply = <&pp3300_disp>;
-
-		panel-timing {
-			clock-frequency = <266666667>;
-			hactive = <2400>;
-			hfront-porch = <48>;
-			hback-porch = <84>;
-			hsync-len = <32>;
-			hsync-active = <0>;
-			vactive = <1600>;
-			vfront-porch = <3>;
-			vback-porch = <120>;
-			vsync-len = <10>;
-			vsync-active = <0>;
-		};
 
 		port {
 			panel_in_edp: endpoint {
@@ -92,7 +77,7 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&bt_host_wake_l>, <&cpu1_pen_eject>;
 
-	switch-pen-insert {
+	pen-insert {
 		label = "Pen Insert";
 		/* Insert = low, eject = high */
 		gpios = <&gpio0 13 GPIO_ACTIVE_LOW>;
@@ -133,17 +118,13 @@
 			map0 {
 				trip = <&ppvar_bigcpu_alert>;
 				cooling-device =
-					<&cpu_l0 THERMAL_NO_LIMIT THERMAL_NO_LIMIT>,
-					<&cpu_l1 THERMAL_NO_LIMIT THERMAL_NO_LIMIT>,
-					<&cpu_l2 THERMAL_NO_LIMIT THERMAL_NO_LIMIT>,
-					<&cpu_l3 THERMAL_NO_LIMIT THERMAL_NO_LIMIT>;
+					<&cpu_l0 THERMAL_NO_LIMIT THERMAL_NO_LIMIT>;
 				contribution = <4096>;
 			};
 			map1 {
 				trip = <&ppvar_bigcpu_alert>;
 				cooling-device =
-					<&cpu_b0 THERMAL_NO_LIMIT THERMAL_NO_LIMIT>,
-					<&cpu_b1 THERMAL_NO_LIMIT THERMAL_NO_LIMIT>;
+					<&cpu_b0 THERMAL_NO_LIMIT THERMAL_NO_LIMIT>;
 				contribution = <1024>;
 			};
 		};

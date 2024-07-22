@@ -1,0 +1,31 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright (c) 2020 Rockchip Electronics Co., Ltd.
+ *
+ */
+
+#include "rk3568-lubancat-dsi0-ebf410125_720p.dtsi"
+
+&route_dsi0 {
+	status = "okay";
+	connect = <&vp0_out_dsi0>;
+};
+
+&dsi0_in_vp0 {
+	status = "okay";
+};
+
+&dsi0_in_vp1 {
+	status = "disabled";
+};
+
+&dsi0_panel {
+	reset-gpios = <&gpio3 RK_PA4 GPIO_ACTIVE_LOW>;
+};
+
+&gt911 {
+	interrupt-parent = <&gpio3>;
+	interrupts = <RK_PA1 IRQ_TYPE_LEVEL_LOW>;
+	reset-gpios = <&gpio3 RK_PA2 GPIO_ACTIVE_LOW>;
+	irq-gpios = <&gpio3 RK_PA1 GPIO_ACTIVE_HIGH>;
+};

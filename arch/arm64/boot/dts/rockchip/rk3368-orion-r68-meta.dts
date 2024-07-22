@@ -11,11 +11,6 @@
 	model = "Rockchip Orion R68";
 	compatible = "tronsmart,orion-r68-meta", "rockchip,rk3368";
 
-	aliases {
-		mmc0 = &sdmmc;
-		mmc1 = &emmc;
-	};
-
 	chosen {
 		stdout-path = "serial2:115200n8";
 	};
@@ -44,7 +39,7 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&pwr_key>;
 
-		key-power {
+		power {
 			wakeup-source;
 			gpios = <&gpio0 RK_PA5 GPIO_ACTIVE_HIGH>;
 			label = "GPIO Power";
@@ -55,7 +50,7 @@
 	leds: gpio-leds {
 		compatible = "gpio-leds";
 
-		red_led: led-0 {
+		red {
 			gpios = <&gpio3 RK_PD5 GPIO_ACTIVE_HIGH>;
 			label = "orion:red:led";
 			pinctrl-names = "default";
@@ -63,7 +58,7 @@
 			default-state = "on";
 		};
 
-		blue_led: led-1 {
+		blue {
 			gpios = <&gpio0 RK_PB4 GPIO_ACTIVE_HIGH>;
 			label = "orion:blue:led";
 			pinctrl-names = "default";
@@ -134,7 +129,7 @@
 
 	vccio_sd: vcc-io-sd-regulator {
 		compatible = "regulator-fixed";
-		regulator-name = "vccio_sd";
+		regulator-name= "vccio_sd";
 		regulator-min-microvolt = <1800000>;
 		regulator-max-microvolt = <3300000>;
 		regulator-always-on;
@@ -166,6 +161,7 @@
 &emmc {
 	bus-width = <8>;
 	cap-mmc-highspeed;
+	disable-wp;
 	mmc-pwrseq = <&emmc_pwrseq>;
 	mmc-hs200-1_2v;
 	mmc-hs200-1_8v;
@@ -188,7 +184,7 @@
 	snps,reset-delays-us = <0 10000 1000000>;
 	tx_delay = <0x30>;
 	rx_delay = <0x10>;
-	status = "okay";
+	status = "ok";
 };
 
 &i2c0 {
@@ -208,10 +204,11 @@
 		vin-supply = <&vcc_sys>;
 	};
 
-	hym8563: rtc@51 {
+	hym8563: hym8563@51 {
 		compatible = "haoyu,hym8563";
 		reg = <0x51>;
 		#clock-cells = <0>;
+		clock-frequency = <32768>;
 		clock-output-names = "xin32k";
 		/* rtc_int is not connected */
 	};
