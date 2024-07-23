@@ -59,7 +59,7 @@
 		rockchip,phy-grf = <&pcie30_phy_grf>;
 		status = "disabled";
 	};
-
+/*
 	pcie3x1: pcie@fe270000 {
 		compatible = "rockchip,rk3568-pcie";
 		#address-cells = <3>;
@@ -101,7 +101,62 @@
 		reg-names = "dbi", "apb", "config";
 		resets = <&cru SRST_PCIE30X1_POWERUP>;
 		reset-names = "pipe";
+*/
 		/* bifurcation; lane1 when using 1+1 */
+/*		status = "disabled";
+
+		pcie3x1_intc: legacy-interrupt-controller {
+			interrupt-controller;
+			#address-cells = <0>;
+			#interrupt-cells = <1>;
+			interrupt-parent = <&gic>;
+			interrupts = <GIC_SPI 157 IRQ_TYPE_EDGE_RISING>;
+		};
+	};
+*/
+	pcie3x1: pcie@fe270000 {
+		compatible = "rockchip,rk3568-pcie", "snps,dw-pcie";
+		#address-cells = <3>;
+		#size-cells = <2>;
+		bus-range = <0x10 0x1f>;
+		clocks = <&cru ACLK_PCIE30X1_MST>, <&cru ACLK_PCIE30X1_SLV>,
+			 <&cru ACLK_PCIE30X1_DBI>, <&cru PCLK_PCIE30X1>,
+			 <&cru CLK_PCIE30X1_AUX_NDFT>;
+		clock-names = "aclk_mst", "aclk_slv",
+			      "aclk_dbi", "pclk", "aux";
+		device_type = "pci";
+		interrupts = <GIC_SPI 160 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 159 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 158 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 157 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 156 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "sys", "pmc", "msg", "legacy", "err";
+		#interrupt-cells = <1>;
+		interrupt-map-mask = <0 0 0 7>;
+		interrupt-map = <0 0 0 1 &pcie3x1_intc 0>,
+				<0 0 0 2 &pcie3x1_intc 1>,
+				<0 0 0 3 &pcie3x1_intc 2>,
+				<0 0 0 4 &pcie3x1_intc 3>;
+		linux,pci-domain = <1>;
+		num-ib-windows = <6>;
+		num-ob-windows = <2>;
+		num-viewport = <8>;
+		max-link-speed = <3>;
+		msi-map = <0x1000 &gic 0x1000 0x1000>;
+		num-lanes = <1>;
+		phys = <&pcie30phy>;
+		phy-names = "pcie-phy";
+		power-domains = <&power RK3568_PD_PIPE>;
+		ranges = <0x00000800 0x0 0xf2000000 0x0 0xf2000000 0x0 0x100000
+			  0x81000000 0x0 0xf2100000 0x0 0xf2100000 0x0 0x100000
+			  0x82000000 0x0 0xf2200000 0x0 0xf2200000 0x0 0x1e00000
+			  0xc3000000 0x3 0x40000000 0x3 0x40000000 0x0 0x40000000>;
+		reg = <0x3 0xc0400000 0x0 0x400000>,
+		      <0x0 0xfe270000 0x0 0x10000>;
+		reg-names = "pcie-dbi", "pcie-apb";
+		resets = <&cru SRST_PCIE30X1_POWERUP>;
+		reset-names = "pipe";
+		/* rockchip,bifurcation; lane1 when using 1+1 */
 		status = "disabled";
 
 		pcie3x1_intc: legacy-interrupt-controller {

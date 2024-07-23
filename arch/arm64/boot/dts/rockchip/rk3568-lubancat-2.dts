@@ -534,12 +534,57 @@
 &pcie30phy {
 	status = "okay";
 };
-
+/*
 &pcie3x2 {
 	reset-gpios = <&gpio2 RK_PD6 GPIO_ACTIVE_HIGH>;
 	vpcie3v3-supply = <&vcc3v3_m2_pcie>;
 	status = "okay";
 };
+*/
+
+&pcie3x2 {
+	rockchip,bifurcation;
+	reset-gpios = <&gpio2 RK_PD4 GPIO_ACTIVE_HIGH>;
+	vpcie3v3-supply = <&vcc3v3_m2_pcie>;
+	status = "okay";
+
+	pcie@20 {
+		reg = <0x00200000 0 0 0 0>;
+		#address-cells = <3>;
+		#size-cells = <2>;
+
+		rtl8125_2: pcie-eth@20,0 {
+			compatible = "pci10ec,8125";
+			reg = <0x000000 0 0 0 0>;
+
+			realtek,led-ledsel2 = <0x022b>;
+			realtek,led-ledsel3 = <0x002b>;
+		};
+	};
+};
+
+
+&pcie3x1 {
+	rockchip,bifurcation;
+	reset-gpios = <&gpio2 RK_PD5 GPIO_ACTIVE_HIGH>;
+	vpcie3v3-supply = <&vcc3v3_m2_pcie>;
+	status = "okay";
+
+	pcie@10 {
+		reg = <0x00100000 0 0 0 0>;
+		#address-cells = <3>;
+		#size-cells = <2>;
+
+		rtl8125_1: pcie-eth@10,0 {
+			compatible = "pci10ec,8125";
+			reg = <0x000000 0 0 0 0>;
+
+			realtek,led-ledsel2 = <0x022b>;
+			realtek,led-ledsel3 = <0x002b>;
+		};
+	};
+};
+
 
 &pcie2x1 {
 	reset-gpios = <&gpio3 RK_PC1 GPIO_ACTIVE_HIGH>;
