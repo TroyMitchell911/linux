@@ -43,14 +43,23 @@
 	leds {
 		compatible = "gpio-leds";
 
-		user_led: user-led {
-			label = "user_led";
+		link_led: link-led {
+			label = "link_led";
 			linux,default-trigger = "heartbeat";
 			default-state = "on";
 			gpios = <&gpio0 RK_PA6 GPIO_ACTIVE_LOW>;
 			//gpios = <&gpio0 RK_PA5 GPIO_ACTIVE_LOW>;
 			pinctrl-names = "default";
-			pinctrl-0 = <&user_led_pin>;
+			pinctrl-0 = <&link_led_pin>;
+		};
+		
+		sys_led: sys-led {
+			label = "sys_led";
+			linux,default-trigger = "heartbeat";
+			default-state = "on";
+			gpios = <&gpio0 RK_PA5 GPIO_ACTIVE_LOW>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&sys_led_pin>;
 		};
 	};
 
@@ -777,10 +786,13 @@
 
 &pinctrl {
 	leds {
-		user_led_pin: user-status-led-pin {
+		link_led_pin: link-status-led-pin {
 			rockchip,pins = <0 RK_PA6 RK_FUNC_GPIO &pcfg_pull_none>;
-			//rockchip,pins = <0 RK_PA5 RK_FUNC_GPIO &pcfg_pull_none>;
 		};
+		sys_led_pin: sys-status-led-pin {
+			rockchip,pins = <0 RK_PA5 RK_FUNC_GPIO &pcfg_pull_none>;
+		};
+
 	};
 
 	keys {
