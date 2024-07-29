@@ -663,6 +663,12 @@
 	status = "disabled";
 };
 
+&uart7 {
+	pinctrl-0 = <&uart7m1_xfer>;
+	pinctrl-names = "default";
+	status = "okay";
+};
+
 &saradc {
 	vref-supply = <&vcca_1v8>;
 	status = "okay";
