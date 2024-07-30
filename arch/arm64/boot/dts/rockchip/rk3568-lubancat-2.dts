@@ -669,6 +669,16 @@
 	status = "okay";
 };
 
+&uart3 {
+	/* 
+	Altough we have a direction pin in schematic but the direction of` 485 chip is be controled by hardware.
+	So we don't need to add more info.	 
+	*/
+	pinctrl-0 = <&uart3m1_xfer>;
+	pinctrl-names = "default";
+	status = "okay";
+};
+
 &saradc {
 	vref-supply = <&vcca_1v8>;
 	status = "okay";
