@@ -283,6 +283,19 @@
 		#phy-cells = <1>;
 		status = "disabled";
 	};
+	
+	can2: can@fe590000 {
+		compatible = "rockchip,canfd-1.0";
+		reg = <0x0 0xfe590000 0x0 0x1000>;
+		interrupts = <GIC_SPI 3 IRQ_TYPE_LEVEL_HIGH>;
+		clocks = <&cru CLK_CAN2>, <&cru PCLK_CAN2>;
+		clock-names = "baudclk", "apb_pclk";
+		resets = <&cru SRST_CAN2>, <&cru SRST_P_CAN2>;
+		reset-names = "can", "can-apb";
+		tx-fifo-depth = <1>;
+		rx-fifo-depth = <6>;
+		status = "disabled";
+	};
 };
 
 &cpu0_opp_table {
