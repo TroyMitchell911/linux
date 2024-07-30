@@ -1,0 +1,2 @@
+kernel/drivers/net/can/rockchip/rockchip_can.ko
+kernel/drivers/net/can/rockchip/rockchip_canfd.ko
