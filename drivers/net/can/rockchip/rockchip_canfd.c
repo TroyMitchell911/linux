@@ -24,7 +24,6 @@
 #include <linux/types.h>
 #include <linux/can/dev.h>
 #include <linux/can/error.h>
-#include <linux/can/led.h>
 #include <linux/reset.h>
 #include <linux/pm_runtime.h>
 #include <linux/rockchip/cpu.h>
@@ -550,7 +549,8 @@ static int rockchip_canfd_start_xmit(struct sk_buff *skb,
 	if (cf->can_id & CAN_EFF_FLAG) {
 		/* Extended CAN ID format */
 		id = cf->can_id & CAN_EFF_MASK;
-		dlc = can_len2dlc(cf->len) & DLC_MASK;
+		/* Where I found: https://lore.kernel.org/all/20201110101852.1973-6-socketcan@hartkopp.net/ */
+		dlc = can_fd_len2dlc(cf->len) & DLC_MASK;
 		dlc |= FORMAT_MASK;
 
 		/* Extended frames remote TX request */
@@ -559,7 +559,8 @@ static int rockchip_canfd_start_xmit(struct sk_buff *skb,
 	} else {
 		/* Standard CAN ID format */
 		id = cf->can_id & CAN_SFF_MASK;
-		dlc = can_len2dlc(cf->len) & DLC_MASK;
+		/* Where I found: https://lore.kernel.org/all/20201110101852.1973-6-socketcan@hartkopp.net/*/
+		dlc = can_fd_len2dlc(cf->len) & DLC_MASK;
 
 		/* Standard frames remote TX request */
 		if (cf->can_id & CAN_RTR_FLAG)
@@ -596,7 +597,7 @@ static int rockchip_canfd_start_xmit(struct sk_buff *skb,
 		for (i = 0; i < cf->len; i += 4)
 			rockchip_canfd_write(rcan, CAN_TXDAT0 + i,
 					     *(u32 *)(cf->data + i));
-		can_put_echo_skb(skb, ndev, 0);
+		can_put_echo_skb(skb, ndev, 0, 0);
 		rockchip_canfd_write(rcan, CAN_CMD, CAN_TX1_REQ);
 		local_irq_restore(flags);
 		return NETDEV_TX_OK;
@@ -609,7 +610,7 @@ static int rockchip_canfd_start_xmit(struct sk_buff *skb,
 		rockchip_canfd_write(rcan, CAN_TXDAT0 + i,
 				     *(u32 *)(cf->data + i));
 
-	can_put_echo_skb(skb, ndev, 0);
+	can_put_echo_skb(skb, ndev, 0, 0);
 	rockchip_canfd_write(rcan, CAN_MODE,
 			     rockchip_canfd_read(rcan, CAN_MODE) | MODE_SPACE_RX);
 	rockchip_canfd_write(rcan, CAN_CMD, cmd);
@@ -664,9 +665,11 @@ static int rockchip_canfd_rx(struct net_device *ndev)
 
 	/* Change CAN data length format to socketCAN data format */
 	if (dlc & FDF_MASK)
-		cf->len = can_dlc2len(dlc & DLC_MASK);
+		/* Where I found: https://lore.kernel.org/all/20201120133318.3428231-7-mkl@pengutronix.de/ */
+		cf->len = can_fd_dlc2len(dlc & DLC_MASK);
 	else
-		cf->len = get_can_dlc(dlc & DLC_MASK);
+		/* where I found: https://lore.kernel.org/all/20201120133318.3428231-4-mkl@pengutronix.de/ */
+		cf->len = can_cc_dlc2len(dlc & DLC_MASK);
 
 	/* Change CAN ID format to socketCAN ID format */
 	if (dlc & FORMAT_MASK) {
@@ -695,7 +698,7 @@ static int rockchip_canfd_rx(struct net_device *ndev)
 	stats->rx_bytes += cf->len;
 	netif_rx(skb);
 
-	can_led_event(ndev, CAN_LED_EVENT_RX);
+//	can_led_event(ndev, CAN_LED_EVENT_RX);
 
 	return 1;
 }
@@ -737,8 +740,8 @@ static int rockchip_canfd_rx_poll(struct napi_struct *napi, int quota)
 			work_done += rockchip_canfd_rx(ndev);
 	}
 
-	if (work_done)
-		can_led_event(ndev, CAN_LED_EVENT_RX);
+//	if (work_done)
+////		can_led_event(ndev, CAN_LED_EVENT_RX);
 
 	if (work_done < 6) {
 		napi_complete_done(napi, work_done);
@@ -801,7 +804,7 @@ static int rockchip_canfd_err(struct net_device *ndev, u32 isr)
 		cancel_delayed_work(&rcan->tx_err_work);
 		netif_stop_queue(ndev);
 		rockchip_canfd_stop(ndev);
-		can_free_echo_skb(ndev, 0);
+		can_free_echo_skb(ndev, 0, NULL);
 		rockchip_canfd_start(ndev);
 		netif_start_queue(ndev);
 	}
@@ -823,14 +826,16 @@ static irqreturn_t rockchip_canfd_interrupt(int irq, void *dev_id)
 	u32 isr;
 	u32 dlc = 0;
 	u32 quota, work_done = 0;
-
+	int ret;
+		
 	isr = rockchip_canfd_read(rcan, CAN_INT);
 	if (isr & TX_FINISH_INT) {
 		cancel_delayed_work(&rcan->tx_err_work);
 		dlc = rockchip_canfd_read(rcan, CAN_TXFIC);
 		/* transmission complete interrupt */
 		if (dlc & FDF_MASK)
-			stats->tx_bytes += can_dlc2len(dlc & DLC_MASK);
+			/* Where I found: https://lore.kernel.org/all/20201120133318.3428231-7-mkl@pengutronix.de/ */
+			stats->tx_bytes += can_fd_dlc2len(dlc & DLC_MASK);
 		else
 			stats->tx_bytes += (dlc & DLC_MASK);
 		stats->tx_packets++;
@@ -850,9 +855,9 @@ static irqreturn_t rockchip_canfd_interrupt(int irq, void *dev_id)
 					      0, 5000000))
 			netdev_err(ndev, "Warning: wait tx req timeout!\n");
 		rockchip_canfd_write(rcan, CAN_CMD, 0);
-		can_get_echo_skb(ndev, 0);
+		ret = can_get_echo_skb(ndev, 0, NULL);
 		netif_wake_queue(ndev);
-		can_led_event(ndev, CAN_LED_EVENT_TX);
+//		can_led_event(ndev, CAN_LED_EVENT_TX);
 	}
 
 	if (isr & RX_FINISH_INT) {
@@ -904,7 +909,7 @@ static int rockchip_canfd_open(struct net_device *ndev)
 		goto exit_can_start;
 	}
 
-	can_led_event(ndev, CAN_LED_EVENT_OPEN);
+//	can_led_event(ndev, CAN_LED_EVENT_OPEN);
 	if (rcan->mode == ROCKCHIP_RK3568_CAN_MODE_V2)
 		napi_enable(&rcan->napi);
 	netif_start_queue(ndev);
@@ -928,7 +933,7 @@ static int rockchip_canfd_close(struct net_device *ndev)
 		napi_disable(&rcan->napi);
 	rockchip_canfd_stop(ndev);
 	close_candev(ndev);
-	can_led_event(ndev, CAN_LED_EVENT_STOP);
+//	can_led_event(ndev, CAN_LED_EVENT_STOP);
 	pm_runtime_put(rcan->dev);
 	cancel_delayed_work_sync(&rcan->tx_err_work);
 
@@ -1154,7 +1159,7 @@ static int rockchip_canfd_probe(struct platform_device *pdev)
 
 	if (rcan->mode == ROCKCHIP_RK3568_CAN_MODE_V2) {
 		rcan->txtorx = 0;
-		netif_napi_add(ndev, &rcan->napi, rockchip_canfd_rx_poll, 6);
+		netif_napi_add(ndev, &rcan->napi, rockchip_canfd_rx_poll);
 	}
 
 	ndev->netdev_ops = &rockchip_canfd_netdev_ops;
@@ -1184,7 +1189,7 @@ static int rockchip_canfd_probe(struct platform_device *pdev)
 		goto err_disableclks;
 	}
 
-	devm_can_led_init(ndev);
+//	devm_can_led_init(ndev);
 
 	return 0;
 
