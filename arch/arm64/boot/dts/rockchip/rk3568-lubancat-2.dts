@@ -517,7 +517,7 @@
 
 &gmac1 {
 	phy-mode = "rgmii";
-	clock_in_out = "input";
+	clock_in_out = "output";
 
 	snps,reset-gpio = <&gpio0 RK_PC7 GPIO_ACTIVE_LOW>;
 	snps,reset-active-low;
