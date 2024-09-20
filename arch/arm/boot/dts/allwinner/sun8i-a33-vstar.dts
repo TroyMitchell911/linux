@@ -50,8 +50,8 @@
 #include <dt-bindings/input/input.h>
 
 / {
-	model = "Sinlinx SinA33";
-	compatible = "sinlinx,sina33", "allwinner,sun8i-a33";
+	model = "Vstar A33";
+	compatible = "vstar,a33", "allwinner,sun8i-a33";
 
 	aliases {
 		serial2 = &uart2;
