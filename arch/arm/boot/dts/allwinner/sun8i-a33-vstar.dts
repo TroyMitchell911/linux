@@ -54,11 +54,11 @@
 	compatible = "sinlinx,sina33", "allwinner,sun8i-a33";
 
 	aliases {
-		serial0 = &uart0;
+		serial2 = &uart2;
 	};
 
 	chosen {
-		stdout-path = "serial0:115200n8";
+		stdout-path = "serial2:115200n8";
 	};
 
 	panel {
@@ -261,6 +261,12 @@
 &uart0 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&uart0_pb_pins>;
+	status = "disabled";
+};
+
+&uart2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&uart2_pins>;
 	status = "okay";
 };
 
@@ -272,4 +278,11 @@
 &usbphy {
 	status = "okay";
 	usb1_vbus-supply = <&reg_vcc5v0>; /* USB1 VBUS is always on */
+};
+
+&pio {
+	uart2_pins: uart2-pins {
+		pins = "PB0", "PB1";
+		function = "uart2";
+	};
 };
