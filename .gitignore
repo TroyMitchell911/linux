@@ -14,6 +14,8 @@
 *.a
 *.asn1.[ch]
 *.bin
+!/kernel/firmware/*.bin
+!/kernel/firmware/brcm/*.bin
 *.bz2
 *.c.[012]*.*
 *.dt.yaml
