@@ -55,6 +55,10 @@
 
 	aliases {
 		serial2 = &uart2;
+		/* SD Card */
+		mmc0 = &mmc0;
+		/* emmc */
+		mmc1 = &mmc2;
 	};
 
 	chosen {
